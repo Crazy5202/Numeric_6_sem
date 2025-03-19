@@ -2,7 +2,7 @@ import os
 import math
 from copy import deepcopy
 
-class Iter:
+class ROTATE_SOLVER:
     def __init__(self):
         self.A = []
         self.n = 0
@@ -99,17 +99,15 @@ class Iter:
                     return False
         return True 
 
-    def solve(self) -> tuple[list,int]:
-        """Решить методом вращений."""
+    def solve(self) -> tuple[list,list,int]:
+        """Найти СЗ и СВ методом вращений."""
         if self.check_conditions() == False:
             return [], [], 0
         
         A_k = deepcopy(self.A)
         U = [[0.0]*self.n for _ in range (self.n)]
         for i in range(self.n):
-            for j in range(self.n):
-                if (i==j):
-                    U[i][j] = 1
+            U[i][i] = 1
         counter = 0
         while (self.stop_condition(A_k)>self.precision):
             counter +=1
@@ -123,9 +121,7 @@ class Iter:
             angle = 1/2*math.atan(2*A_k[max_ind[0]][max_ind[1]]/(A_k[max_ind[0]][max_ind[0]]-A_k[max_ind[1]][max_ind[1]]))
             U_k = [[0.0]*self.n for _ in range (self.n)]
             for i in range(self.n):
-                for j in range(self.n):
-                    if (i==j):
-                        U_k[i][j] = 1
+                U_k[i][i] = 1
             U_k[max_ind[0]][max_ind[0]] = math.cos(angle)
             U_k[max_ind[0]][max_ind[1]] = -math.sin(angle)
             U_k[max_ind[1]][max_ind[0]] = math.sin(angle)
@@ -135,9 +131,7 @@ class Iter:
             A_k = self.multiply_matrix(A_k, U_k)
         values = []
         for i in range(self.n):
-            for j in range(self.n):
-                if (i==j):
-                    values.append(A_k[i][j])
+            values.append(A_k[i][i])
         vectors = []
         for i in range(self.n):
             vectors.append([U[j][i] for j in range(self.n)])
@@ -147,17 +141,20 @@ class Iter:
                 
 
 if __name__ == "__main__":
-    matrix = Iter()
+    matrix = ROTATE_SOLVER()
+
     round_num = matrix.read_from_file("matrix_4.txt")
-    matrix.get_precision_num()
+
     values, vectors, iters = matrix.solve()
     print("\nСобственные значения")
     for i in range(len(values)):
         print(f"СЗ_{i+1}: {round(values[i],round_num)}")
+
     print("\nСобственные векторы")
     for i in range(len(vectors)):
         print(f"СВ_{i+1}: ", end = "")
         for elem in vectors[i]:
             print(f"{round(elem,round_num)} ", end = "")
         print("")
+        
     print(f"\nЧисло итераций: {iters}\n")

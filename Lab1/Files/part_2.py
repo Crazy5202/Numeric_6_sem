@@ -1,6 +1,6 @@
 import os
 
-class TriDiag:
+class TRIDIAG_SOLVER:
     def __init__(self):
         self.a = []
         self.b = []
@@ -82,8 +82,10 @@ class TriDiag:
             print(self.a[i], self.b[i], self.c[i], "=", self.d[i], "\n")
 
 if __name__ == "__main__":
-    matrix = TriDiag()
+    matrix = TRIDIAG_SOLVER()
+
     matrix.read_from_file("matrix_2.txt")
+    
     result = matrix.solve()
     for i in range (len(result)):
         print(f"x_{i} = {round(result[i],3)}\n")

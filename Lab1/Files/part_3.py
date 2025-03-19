@@ -1,6 +1,6 @@
 import os
 
-class Iter:
+class ITER_SOLVER:
     def __init__(self):
         self.A = []
         self.b = []
@@ -140,14 +140,16 @@ class Iter:
             x = new_x
 
 if __name__ == "__main__":
-    matrix = Iter()
+    matrix = ITER_SOLVER()
+
     round_num = matrix.read_from_file("matrix_3.txt")
-    matrix.get_precision_num()
+
     result, iters = matrix.simple_iter()
     print("\nМЕТОД ПРОСТЫХ ИТЕРАЦИЙ\n")
     for i in range (len(result)):
         print(f"x_{i+1} = {round(result[i],round_num)}\n")
-    print(f"Число итераций: {iters}")
+    print(f"Число итераций: {iters}\n")
+    
     result, iters = matrix.zeydel()
     print("\nМЕТОД ЗЕЙДЕЛЯ\n")
     for i in range (len(result)):

@@ -2,7 +2,7 @@ import os
 from copy import deepcopy
 from pprint import pprint
 
-class SOLVER:
+class LU_SOLVER:
     def __init__(self):
         self.A = []
         self.b = []
@@ -108,7 +108,7 @@ class SOLVER:
         
 
 if __name__ == "__main__":
-    matrix = SOLVER()
+    matrix = LU_SOLVER()
 
     matrix.read_from_file("matrix_1.txt")
 
@@ -130,15 +130,11 @@ if __name__ == "__main__":
     print("\nОбратная матрица:")
     for row in inverted:
         for elem in row:
-            if (elem>0 and elem < 10):
-                print(" ", end="")
             print(f"{round(elem,3)} ", end = "")
         print("")
     
     print("Произведение на обратную матрицу:")
     for row in check:
         for elem in row:
-            if (elem>0 and elem < 10):
-                print(" ", end="")
             print(f"{round(elem,3)} ", end = "")
         print("")
