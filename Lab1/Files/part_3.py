@@ -66,14 +66,16 @@ class ITER_SOLVER:
     def check_conditions(self) -> bool:
         """Проверить сходимость."""
         for i in range (self.n):
-            not_diag = 0
+            not_diag_row = 0
+            not_diag_col = 0
             for j in range(self.n):
                 if (i==j):
                     continue
-                not_diag += abs(self.A[i][j])
-            if abs(self.A[i][i]) <= not_diag:
+                not_diag_row += abs(self.A[i][j])
+                not_diag_col += abs(self.A[j][i])
+            if abs(self.A[i][i]) <= not_diag_col and abs(self.A[i][i]) <= not_diag_row:
                 print("Не удовлетворяет условию сходимости.")
-                return False
+                break
         print("Удовлетворяет условию сходимости.")
         return True
     
