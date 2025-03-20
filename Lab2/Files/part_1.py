@@ -3,7 +3,7 @@ from matplotlib import pyplot as plt
 
 class NONLINEAR_SIGNLE_SOLVER:
     def __init__(self):
-        self.precision = 0.001
+        self.precision = 1e-8
 
     def get_precision_num(self) -> int:
         """Получить число нулей погрешности."""
@@ -44,13 +44,22 @@ class NONLINEAR_SIGNLE_SOLVER:
         plt.grid()
         plt.show()
 
-    def check_conditions_newton(self, a, b):
-        if (self.calc_equation(a)*self.calc_equation(b)<0 and self.calc_equation(b)*self.second_derivative(b)>0):
-            return True
+    def check_conditions_newton(self, a, b) -> tuple[bool, float]:
+        val = 0
+        fact = True
+        if self.calc_equation(a)*self.calc_equation(b)<0 and abs(self.calc_equation(a)*self.second_derivative(a))<self.first_derivative(a)**2 and (abs(self.calc_equation(b)*self.second_derivative(b))<self.first_derivative(b)**2):
+            if (self.calc_equation(a)*self.second_derivative(a)>0):
+                val = a
+            elif (self.calc_equation(b)*self.second_derivative(b)>0):
+                val = b
+            else:
+                fact = False
         else:
+            fact = False
+        if (fact == False):
             print("Границы выбраны неверно")
-            return False
-
+        return fact, val
+        
     def newton(self) -> tuple[float,int]:
         """Найти корень методом Ньютона."""
         counter = 0
@@ -60,11 +69,11 @@ class NONLINEAR_SIGNLE_SOLVER:
             self.draw_equation()
             a = float(input("\nВведите левую границу: "))
             b = float(input("\nВведите правую границу: "))
-            if not(a>0 and b>=a):
-                print("Границы должны быть положительными и вторая больше первой.")
+            if not(a>=0 and b>=a):
+                print("Границы должны быть неотрицательными и вторая больше первой.")
                 continue
-            if (self.check_conditions_newton(a,b)):
-                ans = b
+            fact, ans = self.check_conditions_newton(a,b)
+            if (fact):
                 break
         while (1):
             counter += 1
@@ -84,20 +93,17 @@ class NONLINEAR_SIGNLE_SOLVER:
         return math.log(5*x+2, 2)/2
 
     def check_conditions_iters(self, a, b) -> tuple[bool, float]:
-        split = 11
         left_edge = a
         right_edge = b
-        x = [left_edge + (right_edge-left_edge)/split*i for i in range (split)]
-        max_val = self.chosen_derivative(left_edge)
-        for elem in x:
+        for elem in [left_edge, right_edge]:
             val = self.chosen_function(elem)
             if val<left_edge or val>right_edge:
                 print("Функция не удовлетворяет условию 1 на отрезке")
                 return False, 0
-            max_val = max(max_val, self.chosen_derivative(left_edge))
-        if max_val >= 1:
+        if self.chosen_derivative(left_edge) >= 1 and self.chosen_derivative(right_edge)>=1:
             print("Функция не удовлетворяет условию 2 на отрезке")
             return False, 0
+        max_val = min(self.chosen_derivative(left_edge), self.chosen_derivative(right_edge))
         return True, max_val
 
     def simple_iters(self) -> tuple[float, int]:
@@ -109,8 +115,8 @@ class NONLINEAR_SIGNLE_SOLVER:
             self.draw_equation()
             a = float(input("\nВведите левую границу: "))
             b = float(input("\nВведите правую границу: "))
-            if not(a>0 and b>=a):
-                print("Границы должны быть положительными и вторая больше первой.")
+            if not(a>=0 and b>=a):
+                print("Границы должны быть неотрицательными и вторая больше первой.")
                 continue
             fact, q = self.check_conditions_iters(a,b)
             if (fact):
@@ -131,14 +137,15 @@ if __name__ == "__main__":
 
     round_num = solver.get_precision_num()
     
-    ans, iters = solver.newton()
-    print("\nМЕТОД НЬЮТОНА")
-    print(f"Корень: {ans}")
+    #ans, iters = solver.newton()
+    #print("\nМЕТОД НЬЮТОНА")
+    #print(f"Корень: {ans}")
 
-    print(f"\nЧисло итераций: {iters}\n")
+    #print(f"\nЧисло итераций: {iters}\n")
     
     ans, iters = solver.simple_iters()
     print("\nМЕТОД ПРОСТЫХ ИТЕРАЦИЙ")
     print(f"Корень: {ans}")
 
     print(f"\nЧисло итераций: {iters}\n")
+    
