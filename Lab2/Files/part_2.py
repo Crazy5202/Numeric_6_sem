@@ -21,8 +21,9 @@ class NONLINEAR_SLAU_SOLVER:
             else:
                 break
         return count
-
     
+
+
     
     def draw_equation_1(self, x):
         return math.cos(x)/3
@@ -53,15 +54,68 @@ class NONLINEAR_SLAU_SOLVER:
         plt.grid()
         plt.show()
 
+
+
+
     def calc_equation_1(self, x1, x2):
         return 3*x1 - math.cos(x2)
     
     def calc_equation_2(self, x1, x2):
         return 3*x2 - math.e**x1
     
-    #
-    #
-    #
+    def eq1_d1(self, x1, x2):
+        return 3
+    
+    def eq1_d2(self, x1, x2):
+        return math.sin(x2)
+    
+    def eq2_d1(self, x1, x2):
+        return -math.e**x1
+    
+    def eq2_d2(self, x1, x2):
+        return 3
+    
+    def jacobian_norm(self, x1, x2):
+        return self.eq1_d1(x1,x2)*self.eq2_d2(x1,x2) - self.eq1_d2(x1,x2)*self.eq2_d1(x1,x2)
+        
+    def calc_d(self, x1, x2):
+        matrix = [[self.eq1_d1(x1,x2), self.eq1_d2(x1,x2), self.calc_equation_1(x1,x2)], 
+                  [self.eq2_d1(x1,x2), self.eq2_d2(x1,x2), self.calc_equation_2(x1,x2)]]
+        coeff = matrix[1][0]/matrix[0][0]
+        for i in range (len(matrix[0])):
+            matrix[1][i] -= matrix[0][i]
+        coeff = matrix[0][1]/matrix[1][1]
+        for i in range (len(matrix[0])):
+            matrix[0][i] -= matrix[1][i]
+        return [matrix[0][2]/matrix[0][0], matrix[1][2]/matrix[1][1]]
+
+
+    def newton(self) -> tuple[float,int]:
+        """Найти корень методом Ньютона."""
+        counter = 0
+        a = 0
+        b = 0
+        print("\n\nВыберите начальное приближение\n")
+        self.draw_equation()
+        b = float(input("\nВведите первую координату: "))
+        a = float(input("\nВведите вторую координату: "))
+        
+        ans = [a, b]
+
+        while (1):
+            counter += 1
+            if self.jacobian_norm(ans[0], ans[1]) < 1e-6:
+                return [], 0
+            d = self.calc_d(ans[0], ans[1])
+            new_ans = [ans[0]-d[0], ans[1]-d[1]] 
+            if (abs(new_ans[0]-ans[0])+abs(new_ans[1]-ans[1])<self.precision):
+                ans = new_ans
+                break
+            ans = new_ans
+        return ans, counter 
+    
+
+
 
     def chosen_function_1(self, x1, x2):
         return math.cos(x2)/3
@@ -85,9 +139,9 @@ class NONLINEAR_SLAU_SOLVER:
             print("Не выполняется ограниченность производной для данной функции и области.")
             return False, 0
         return True, max_coeff
-    
 
     def simple_iters(self) -> tuple[float, int]:
+        """Найти корень методом простых итераций."""
         print("\n\nВыберите начальное приближение\n")
         ans = [0,0]
         counter = 0
@@ -96,15 +150,15 @@ class NONLINEAR_SLAU_SOLVER:
         b = 0
         while(1):
             self.draw_equation()
-        
+
             b = float(input("\nВведите первую координату: "))
             a = float(input("\nВведите вторую координату: "))
             r = float(input("\nВведите радиус области: "))
+            
             fact, q = self.check_conditions_iters(a,b,r)
             if (fact):
                 coeff = q/(1-q)
                 ans = [a, b]
-                #print(f"GOOD! {q}")
                 break
         
         while (1):
@@ -118,62 +172,23 @@ class NONLINEAR_SLAU_SOLVER:
                 break
             ans = new_ans
         return ans, counter
-        
-"""
-    def check_conditions_newton(self, a, b) -> tuple[bool, float]:
-        val = 0
-        fact = True
-        if self.calc_equation(a)*self.calc_equation(b)<0 and abs(self.calc_equation(a)*self.second_derivative(a))<self.first_derivative(a)**2 and (abs(self.calc_equation(b)*self.second_derivative(b))<self.first_derivative(b)**2):
-            if (self.calc_equation(a)*self.second_derivative(a)>0):
-                val = a
-            elif (self.calc_equation(b)*self.second_derivative(b)>0):
-                val = b
-            else:
-                fact = False
-        else:
-            fact = False
-        if (fact == False):
-            print("Границы выбраны неверно")
-        return fact, val
-        
-    def newton(self) -> tuple[float,int]:
-        """"Найти корень методом Ньютона.""""
-        counter = 0
-        ans = 0
-        print("\n\nВыберите положительные границы (значения на границах должны различаться знаком)\n")
-        while(1):
-            self.draw_equation()
-            a = float(input("\nВведите левую границу: "))
-            b = float(input("\nВведите правую границу: "))
-            if not(a>=0 and b>=a):
-                print("Границы должны быть неотрицательными и вторая больше первой.")
-                continue
-            fact, ans = self.check_conditions_newton(a,b)
-            if (fact):
-                break
-        while (1):
-            counter += 1
-            new_ans = ans - self.calc_equation(ans)/self.first_derivative(ans)
-            if (abs(new_ans-ans)<self.precision):
-                ans = new_ans
-                break
-            ans = new_ans
-        return ans, counter 
-"""
+
+
+
 
 if __name__ == "__main__":
     solver = NONLINEAR_SLAU_SOLVER()
 
     round_num = solver.get_precision_num()
     
-    #ans, iters = solver.newton()
-    #print("\nМЕТОД НЬЮТОНА")
-    #print(f"Корень: {ans}")
-
-    #print(f"\nЧисло итераций: {iters}\n")
+    ans, iters = solver.newton()
+    print("\nМЕТОД НЬЮТОНА")
+    print(f"Корень: {round(ans[0], round_num)}, {round(ans[1], round_num)}")
+    print(f"\nЧисло итераций: {iters}\n")
+    
     
     ans, iters = solver.simple_iters()
     print("\nМЕТОД ПРОСТЫХ ИТЕРАЦИЙ")
-    print(f"Корень: {ans}")
-
+    print(f"Корень: {round(ans[0], round_num)}, {round(ans[1], round_num)}")
     print(f"Число итераций: {iters}")
+    
