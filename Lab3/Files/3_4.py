@@ -44,6 +44,7 @@ class NUMERIC_DIFF:
         index = self.find_index()
 
         return 2*((self.right_diff(index) - self.left_diff(index))) / (self.x[index+1] - self.x[index-1])
+        #return (self.y[index+1]-2*self.y[index]+self.y[index-1])/(self.x[index]-self.x[index-1])**2
                 
 
 if __name__ == "__main__":

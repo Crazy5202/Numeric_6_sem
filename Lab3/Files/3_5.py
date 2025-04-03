@@ -28,7 +28,7 @@ class NUMERIC_INTEGR:
     
     def runge(self, sum1, sum2):
         actual_value = 1/128*math.log(3) + math.atan(1/2)/64
-        refined = sum1 + (sum1 - sum2)/((self.h2/self.h1)**2-1)
+        refined = sum1 + (sum1 - sum2)/((self.h2/self.h1)**2 - 1)
         print(f"С шагом {self.h1}: {sum1}, с шагом {self.h2}: {sum2}")
         print(f"Уточнённый по Рунге: {refined}, погрешность: {abs(actual_value-refined)}")
 
