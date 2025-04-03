@@ -1,7 +1,7 @@
 import math
 from matplotlib import pyplot as plt
 
-class NONLINEAR_SLAU_SOLVER:
+class NONLINEAR_SNLAU_SOLVER:
     def __init__(self):
         self.precision = 1e-8
 
@@ -83,10 +83,10 @@ class NONLINEAR_SLAU_SOLVER:
                   [self.eq2_d1(x1,x2), self.eq2_d2(x1,x2), self.calc_equation_2(x1,x2)]]
         coeff = matrix[1][0]/matrix[0][0]
         for i in range (len(matrix[0])):
-            matrix[1][i] -= matrix[0][i]
+            matrix[1][i] -= coeff*matrix[0][i]
         coeff = matrix[0][1]/matrix[1][1]
         for i in range (len(matrix[0])):
-            matrix[0][i] -= matrix[1][i]
+            matrix[0][i] -= coeff*matrix[1][i]
         return [matrix[0][2]/matrix[0][0], matrix[1][2]/matrix[1][1]]
 
 
@@ -105,6 +105,7 @@ class NONLINEAR_SLAU_SOLVER:
         while (1):
             counter += 1
             if self.jacobian_norm(ans[0], ans[1]) < 1e-6:
+                print("\nВырожденная матрица!")
                 return [], 0
             d = self.calc_d(ans[0], ans[1])
             new_ans = [ans[0]-d[0], ans[1]-d[1]] 
@@ -129,16 +130,14 @@ class NONLINEAR_SLAU_SOLVER:
     def chosen_derivative_2(self, x1, x2):
         return math.e**x1/3
     
-    def check_conditions_iters(self, x1, x2, radius) -> tuple[bool, float]:
-        max_coeff = 0
-        for x in [x1-radius, x1, x1+radius]:
-            for y in [x2-radius, x2, x2+radius]:
-                matrix_norm = abs(self.chosen_derivative_1(x1,x2)) + abs(self.chosen_derivative_2(x1,x2))
-                max_coeff = max(max_coeff, matrix_norm)
-        if max_coeff > 1:
-            print("Не выполняется ограниченность производной для данной функции и области.")
+    def check_conditions_iters(self, x1, x2) -> tuple[bool, float]:
+        
+        matrix_norm = abs(self.chosen_derivative_1(x1,x2)) + abs(self.chosen_derivative_2(x1,x2))
+
+        if matrix_norm > 1:
+            print("Не выполняется ограниченность производной для данного начального приближения.")
             return False, 0
-        return True, max_coeff
+        return True, matrix_norm
 
     def simple_iters(self) -> tuple[float, int]:
         """Найти корень методом простых итераций."""
@@ -153,9 +152,8 @@ class NONLINEAR_SLAU_SOLVER:
 
             b = float(input("\nВведите первую координату: "))
             a = float(input("\nВведите вторую координату: "))
-            r = float(input("\nВведите радиус области: "))
             
-            fact, q = self.check_conditions_iters(a,b,r)
+            fact, q = self.check_conditions_iters(a,b)
             if (fact):
                 coeff = q/(1-q)
                 ans = [a, b]
@@ -164,9 +162,6 @@ class NONLINEAR_SLAU_SOLVER:
         while (1):
             counter += 1
             new_ans = [self.chosen_function_1(ans[0], ans[1]), self.chosen_function_2(ans[0], ans[1])]
-            if abs(new_ans[0] - a) > r or abs(new_ans[1] - b) > r:
-                print("\n\nКорень не содержится в выбранной области!!!\n")
-                return [], 0
             if (coeff * (abs(ans[0]-new_ans[0]) + abs(ans[1]-new_ans[1])) < self.precision):
                 ans = new_ans
                 break
@@ -177,18 +172,19 @@ class NONLINEAR_SLAU_SOLVER:
 
 
 if __name__ == "__main__":
-    solver = NONLINEAR_SLAU_SOLVER()
+    solver = NONLINEAR_SNLAU_SOLVER()
 
     round_num = solver.get_precision_num()
     
     ans, iters = solver.newton()
     print("\nМЕТОД НЬЮТОНА")
-    print(f"Корень: {round(ans[0], round_num)}, {round(ans[1], round_num)}")
-    print(f"\nЧисло итераций: {iters}\n")
-    
+    if len(ans)!=0:
+        print(f"Корень: {round(ans[0], round_num)}, {round(ans[1], round_num)}")
+        print(f"\nЧисло итераций: {iters}\n")
     
     ans, iters = solver.simple_iters()
     print("\nМЕТОД ПРОСТЫХ ИТЕРАЦИЙ")
-    print(f"Корень: {round(ans[0], round_num)}, {round(ans[1], round_num)}")
-    print(f"Число итераций: {iters}")
+    if len(ans)!=0:
+        print(f"Корень: {round(ans[0], round_num)}, {round(ans[1], round_num)}")
+        print(f"Число итераций: {iters}")
     

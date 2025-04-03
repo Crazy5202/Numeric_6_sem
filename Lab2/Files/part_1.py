@@ -137,15 +137,13 @@ if __name__ == "__main__":
 
     round_num = solver.get_precision_num()
     
-    #ans, iters = solver.newton()
-    #print("\nМЕТОД НЬЮТОНА")
-    #print(f"Корень: {ans}")
-
-    #print(f"\nЧисло итераций: {iters}\n")
+    ans, iters = solver.newton()
+    print("\nМЕТОД НЬЮТОНА")
+    print(f"Корень: {ans}")
+    print(f"\nЧисло итераций: {iters}\n")
     
     ans, iters = solver.simple_iters()
     print("\nМЕТОД ПРОСТЫХ ИТЕРАЦИЙ")
     print(f"Корень: {ans}")
-
     print(f"\nЧисло итераций: {iters}\n")
     
