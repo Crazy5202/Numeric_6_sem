@@ -25,18 +25,25 @@ class NUMERIC_APPROX:
                 self.b.append(float(elem))
 
     def calc_eq(self, x):
+        """Вычислить приближаемое уравнение."""
         return math.e**x + x
     
-    def find_index(self, array):
+    def find_index(self, array, argument = None):
+        """Найти подходящий индекс для интерполяции."""
+        if argument is None:
+            argument = self.arg
         index = 0
         for elem in array:
-            if elem < self.arg:
+            if elem < argument:
                 index += 1
             else:
                 break
+        if index != 0:
+            index -= 1
         return index
 
     def calc_lagr(self, order, argument = None):
+        """Провести приближение методом Лагранжа."""
         if argument is None:
             argument = self.arg
         sum = []
@@ -45,7 +52,7 @@ class NUMERIC_APPROX:
                 print(f"\nПОРЯДОК СЛИШКОМ ВЫСОКИЙ! МАКСИМУМ {len(arr)-1}")
                 return
             cur_sum = 0
-            pos = self.find_index(arr)
+            pos = self.find_index(arr, argument)
             pos = min(pos, len(arr)-order-1)
             for i in range (pos, pos+order+1):
                 cur_val = self.calc_eq(arr[i])
@@ -62,12 +69,14 @@ class NUMERIC_APPROX:
         return sum[0]
 
     def razd_razn_iter(self, array, left, right):
+        """Разделить разности для метода Ньютона."""
         if (left==right): return self.calc_eq(array[left])
         left_val = self.razd_razn_iter(array, left, right-1)
         right_val = self.razd_razn_iter(array, left+1, right)
         return (left_val - right_val) / (array[left] - array[right])
     
     def calc_newton(self, order, argument = None):
+        """Провести приближение методом Лагранжа."""
         if argument is None:
             argument = self.arg
         sum = []
@@ -76,7 +85,7 @@ class NUMERIC_APPROX:
                 print(f"\nПОРЯДОК СЛИШКОМ ВЫСОКИЙ! МАКСИМУМ {len(arr)-1}")
                 return
             cur_sum = 0
-            pos = self.find_index(arr)
+            pos = self.find_index(arr, argument)
             pos = min(pos, len(arr)-order-1)
             for i in range (pos, pos+order+1):
                 cur_val = self.razd_razn_iter(arr, pos, i)
@@ -121,7 +130,7 @@ if __name__ == "__main__":
     plt.legend()
     plt.show()
 
-    
+
 
     plt.plot(x, func_values, label='Функция')
 
