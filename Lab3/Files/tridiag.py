@@ -80,12 +80,3 @@ class TRIDIAG_SOLVER:
         """Печатает матрицу."""
         for i in range (self.n):
             print(self.a[i], self.b[i], self.c[i], "=", self.d[i], "\n")
-
-if __name__ == "__main__":
-    matrix = TRIDIAG_SOLVER()
-
-    matrix.read_from_file("matrix_2.txt")
-    
-    result = matrix.solve()
-    for i in range (len(result)):
-        print(f"x_{i} = {round(result[i],3)}\n")

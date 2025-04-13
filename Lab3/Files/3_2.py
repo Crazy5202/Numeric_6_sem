@@ -49,8 +49,8 @@ class NUMERIC_APPROX_SPLINE:
 
     def prepare_spline_coeffs(self):
         solver = TRIDIAG_SOLVER()
-        name = "/temp"
-        PATH = os.path.split(os.path.realpath(__file__))[0] + "/temp"
+        name = "temp"
+        PATH = os.path.split(os.path.realpath(__file__))[0] + f"/{name}"
 
         n = len(self.x)-1
 
@@ -68,7 +68,7 @@ class NUMERIC_APPROX_SPLINE:
             f.write(f"{ self.calc_h(n-1) }")
             f.write(f" { 2*(self.calc_h(n-1) + self.calc_h(n)) }")
             f.write(f" { 3*( (self.f[n]-self.f[n-1])/self.calc_h(n) - (self.f[n-1]-self.f[n-2])/self.calc_h(n-1) ) }")
-        solver.read_from_file("temp")
+        solver.read_from_file(name)
         c = [0] + solver.solve()
 
         os.remove(PATH)
