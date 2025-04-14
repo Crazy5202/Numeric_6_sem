@@ -33,16 +33,19 @@ class NUMERIC_KOSHI:
         return sum
     
     def runge(self, sum1, sum2):
-        """Уточнить значение по Рунге."""
-        refined = [sum1[i] + (sum1[i] - sum2[i*2+1])/((1/2)**2 - 1) for i in range(len(sum1))]
+        """Уточнить значение по Рунге-Ромбергу."""
+        refined = [sum1[i] + (sum1[i] - sum2[i*2])/((1/2)**2 - 1) for i in range(len(sum1))]
         return refined
 
     def calc_eiler(self, h) -> list:
         """Рассчитать значения по Эйлеру."""
-        result = []
+        
         x_prev = self.x0
         y_prev = self.corner0
         z_prev = self.corner1
+
+        result = [y_prev]
+
         while (x_prev < self.x1):
             y_new = y_prev + h * z_prev
             z_new = z_prev + h * self.calc_eq(x_prev, y_prev, z_prev)
@@ -55,26 +58,15 @@ class NUMERIC_KOSHI:
             x_prev += h
 
         return result
-
-    def eiler_wrapper(self, h):
-        sum1 = self.calc_eiler(h)
-        sum2 = self.calc_eiler(h/2)
-        refined = self.runge(sum1, sum2)
-        x_array = [self.x0 + h*(i+1) for i in range(int((self.x1-self.x0)/h))]
-        
-        print("\n\nМЕТОД ЭЙЛЕРА\n")
-        print(f"Абсолютная ошибка для сетки {h}: {self.calc_error(x_array, sum1)}")
-        print(f"Абсолютная ошибка с уточнением по Рунге-Ромбергу: {self.calc_error(x_array, refined)}\n\n")
-
-        self.plot(x_array, sum1, refined)
-        return refined
     
-    def calc_kutta(self, h):
-        
-        result = []
+    def calc_kutta(self, h) -> list:
+        """Рассчитать значения по Рунге-Кутте."""
         x_prev = self.x0
         y_prev = self.corner0
         z_prev = self.corner1
+
+        result = [y_prev]
+        
         while (x_prev < self.x1):
             y1 = h * z_prev
             z1 = h * self.calc_eq(x_prev, y_prev, z_prev)
@@ -100,22 +92,70 @@ class NUMERIC_KOSHI:
 
         return result
     
-    def kutta_wrapper(self, h):
-        sum1 = self.calc_kutta(h)
-        sum2 = self.calc_kutta(h/2)
-        refined = self.runge(sum1, sum2)
-        x_array = [self.x0 + h*(i+1) for i in range(int((self.x1-self.x0)/h))]
+    def calc_adams(self, h) -> list:
+        """Рассчитать значения по методу Адамса."""
+
+        x_array = [self.x0]
+        y_array = [self.corner0]
+        z_array = [self.corner1]
+
+        while (x_array[-1] < self.x0 + 4*h):
+            y1 = h * z_array[-1]
+            z1 = h * self.calc_eq(x_array[-1], y_array[-1], z_array[-1])
+
+            y2 = h * (z_array[-1] + 1/2*z1)
+            z2 = h * self.calc_eq(x_array[-1] + 1/2*h, y_array[-1] + 1/2*y1, z_array[-1] + 1/2*z1)
+
+            y3 = h * (z_array[-1] + 1/2*z2)
+            z3 = h * self.calc_eq(x_array[-1] + 1/2*h, y_array[-1] + 1/2*y2, z_array[-1] + 1/2*z2)
+
+            y4 = h * (z_array[-1] + z3)
+            z4 = h * self.calc_eq(x_array[-1] + h, y_array[-1] + y3, z_array[-1] + z3)
+
+            y_new = y_array[-1] + 1/6*(y1 + 2*y2 + 2*y3 + y4)
+            z_new = z_array[-1] + 1/6*(z1 + 2*z2 + 2*z3 + z4)
+
+            x_array.append(x_array[-1]+h)
+            y_array.append(y_new)
+            z_array.append(z_new)
+
+        while (x_array[-1] < self.x1):
+            z_new = z_array[-1] + h/24*(55*self.calc_eq(x_array[-1], y_array[-1], z_array[-1])
+                - 59*self.calc_eq(x_array[-2], y_array[-2], z_array[-2])
+                + 37*self.calc_eq(x_array[-3], y_array[-3], z_array[-3])
+                - 9*self.calc_eq(x_array[-4], y_array[-4], z_array[-4]))
+            
+            y_new = y_array[-1] + h/24*(55*z_array[-1] - 59*z_array[-1]
+                + 37*z_array[-1] - 9*z_array[-1])
+            
+            x_array.append(x_array[-1]+h)
+            y_array.append(y_new)
+            z_array.append(z_new)
         
-        print("\n\nМЕТОД РУНГЕ-КУТТЫ\n")
+        return y_array
+    
+    def wrapper(self, h, method):
+        """Обернуть метод для выполнения общего набора действий."""
+        sum1 = method(h)
+        sum2 = method(h/2)
+        refined = self.runge(sum1, sum2)
+        x_array = [self.x0 + h*i for i in range(int((self.x1-self.x0)/h)+1)]
+        
         print(f"Абсолютная ошибка для сетки {h}: {self.calc_error(x_array, sum1)}")
         print(f"Абсолютная ошибка с уточнением по Рунге-Ромбергу: {self.calc_error(x_array, refined)}\n\n")
 
         self.plot(x_array, sum1, refined)
 
+    def wrapper_wrapper(self, h):
+        """Вызвать все методы."""
+        print("\n\nМЕТОД ЭЙЛЕРА\n")
+        self.wrapper(h, self.calc_eiler)
+        print("\n\nМЕТОД РУНГЕ-КУТТЫ\n")
+        self.wrapper(h, self.calc_kutta)
+        print("\n\nМЕТОД АДАМСА\n")
+        self.wrapper(h, self.calc_adams)
+
 if __name__ == "__main__":
     solver = NUMERIC_KOSHI(1, 2, 2 + math.e, 1 + math.e)
 
-    h = 0.1
-
-    #solver.eiler_wrapper(h)
-    #solver.kutta_wrapper(h)
+    solver.wrapper_wrapper(0.1)
