@@ -46,7 +46,7 @@ class NUMERIC_KOSHI:
 
         result = [y_prev]
 
-        while (x_prev < self.x1):
+        while (x_prev < self.x1 - h/10):
             y_new = y_prev + h * z_prev
             z_new = z_prev + h * self.calc_eq(x_prev, y_prev, z_prev)
 
@@ -67,7 +67,7 @@ class NUMERIC_KOSHI:
 
         result = [y_prev]
         
-        while (x_prev < self.x1):
+        while (x_prev < self.x1 - h/10):
             y1 = h * z_prev
             z1 = h * self.calc_eq(x_prev, y_prev, z_prev)
 
@@ -99,7 +99,7 @@ class NUMERIC_KOSHI:
         y_array = [self.corner0]
         z_array = [self.corner1]
 
-        while (x_array[-1] < self.x0 + 4*h):
+        while (x_array[-1] <= self.x0 + 3*h):
             y1 = h * z_array[-1]
             z1 = h * self.calc_eq(x_array[-1], y_array[-1], z_array[-1])
 
@@ -119,7 +119,7 @@ class NUMERIC_KOSHI:
             y_array.append(y_new)
             z_array.append(z_new)
 
-        while (x_array[-1] < self.x1):
+        while (x_array[-1] < self.x1 - h/10):
             z_new = z_array[-1] + h/24*(55*self.calc_eq(x_array[-1], y_array[-1], z_array[-1])
                 - 59*self.calc_eq(x_array[-2], y_array[-2], z_array[-2])
                 + 37*self.calc_eq(x_array[-3], y_array[-3], z_array[-3])
