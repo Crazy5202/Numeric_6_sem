@@ -91,15 +91,6 @@ class NUMERIC_KOSHI_23:
             algor0 = algor1
             algor1 = new_algor
         return new_res[0]
-    
-    def p(self,x):
-        return (x-3)/(x**2-1)
-    
-    def q(self,x):
-        return -1/(x**2-1)
-    
-    def f(self,x):
-        return 0
 
     def calc_konraz(self, h):
         """Рассчитать методом конечных разностей."""
