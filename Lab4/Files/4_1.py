@@ -16,10 +16,11 @@ class NUMERIC_KOSHI:
     def calc_solution(self, x):
         return x + 1 + math.e**x
     
-    def plot(self, x_array, integrated, refined):
+    def plot(self, x_array, integrated, refined, name):
         plt.plot(x_array, [solver.calc_solution(elem) for elem in x_array], label = 'Правильное решение')
         plt.plot(x_array, integrated, label = 'Численное решение')
         plt.plot(x_array, refined, label = 'Уточнённое численное решение')
+        plt.title(name)
         plt.legend()
         plt.grid()
         plt.show()
@@ -144,7 +145,7 @@ class NUMERIC_KOSHI:
         print(f"Абсолютная ошибка для сетки {h}: {self.calc_error(x_array, sum1)}")
         print(f"Абсолютная ошибка с уточнением по Рунге-Ромбергу: {self.calc_error(x_array, refined)}\n\n")
 
-        self.plot(x_array, sum1, refined)
+        self.plot(x_array, sum1, refined, method.__name__)
 
     def wrapper_wrapper(self, h):
         """Вызвать все методы."""
