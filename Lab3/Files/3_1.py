@@ -65,6 +65,7 @@ class NUMERIC_APPROX:
             sum.append(cur_sum)
         print(f"\nЛагранж степени {order}:")
         for i in range (len(sum)):
+            print(f"Значение в точке: {sum[i]}")
             print(f"Погрешность для значений {i+1}: {abs(sum[i] - self.calc_eq(argument))}")
         return sum[0]
 
@@ -95,6 +96,7 @@ class NUMERIC_APPROX:
             sum.append(cur_sum)
         print(f"\nНьютон степени {order}:")
         for i in range (len(sum)):
+            print(f"Значение в точке: {sum[i]}")
             print(f"Погрешность для значений {i+1}: {abs(sum[i] - self.calc_eq(argument))}")
         return sum[0]
 
@@ -125,6 +127,8 @@ if __name__ == "__main__":
     values = [solver.calc_lagr(3, elem) for elem in x]
     plt.plot(x, values, label = 'Лагранж 3')
 
+    plt.scatter(solver.a, [solver.calc_eq(elem) for elem in solver.a], color='black')
+
     plt.title("Приближение Лагранжем.")
     plt.grid()
     plt.legend()
@@ -139,6 +143,8 @@ if __name__ == "__main__":
 
     values = [solver.calc_newton(3, elem) for elem in x]
     plt.plot(x, values, label = 'Ньютон 3')
+
+    plt.scatter(solver.a, [solver.calc_eq(elem) for elem in solver.a], color='black')
 
     plt.title("Приближение Ньютоном.")
     plt.grid()

@@ -83,6 +83,16 @@ if __name__ == "__main__":
     func_values = [solver.calc_approx(elem) for elem in x]
     plt.plot(x, func_values, label = '2 степень')
 
+    solver.prepare_coeffs(3)
+
+    func_values = [solver.calc_approx(elem) for elem in x]
+    plt.plot(x, func_values, label = '3 степень')
+
+    solver.prepare_coeffs(4)
+
+    func_values = [solver.calc_approx(elem) for elem in x]
+    plt.plot(x, func_values, label = '4 степень')
+
     plt.scatter(solver.x, solver.y, color = 'black')
     plt.title("Метод наименьших квадратов")
     plt.grid()
