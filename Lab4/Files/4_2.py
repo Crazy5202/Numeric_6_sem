@@ -80,17 +80,25 @@ class NUMERIC_KOSHI_23:
         algor0 = self.calc_algor(res0[1][-1], res0[0][-1])
         algor1 = self.calc_algor(res1[1][-1], res1[0][-1])
         
+        iters = 0
+
         while abs(algor1) > self.precision:
+            iters += 1
             new_arg = arg1 - (arg1-arg0)/(algor1-algor0)*algor1
             new_res = method(h, new_arg)
             new_algor = self.calc_algor(new_res[1][-1], new_res[0][-1])
 
             arg0 = arg1
             arg1 = new_arg
+
+            res1 = new_res
             
             algor0 = algor1
             algor1 = new_algor
-        return new_res[0]
+
+        print(f"Число итераций: {iters}")
+
+        return res1[0]
 
     def calc_konraz(self, h):
         """Рассчитать методом конечных разностей."""
@@ -99,8 +107,9 @@ class NUMERIC_KOSHI_23:
 
         A = [[0 for _ in range(N+2)] for _ in range(N+1)]
 
-        A[0][0] = 1
-        A[0][1] = -1
+        A[0][0] = -3
+        A[0][1] = 4
+        A[0][2] = -1
 
         for i in range(1, N):
             xi = self.x0 + h*i
@@ -108,9 +117,10 @@ class NUMERIC_KOSHI_23:
             A[i][i] = -2*(xi**2 - 1) - h**2
             A[i][i+1] = (xi**2 - 1) + (xi - 3)*h/2
 
-        A[N][N-1] = -1/h
-        A[N][N] = 1 + 1/h
-        A[N][N+1] = -0.75
+        A[N][N-2] = 1
+        A[N][N-1] = -4
+        A[N][N] = 3 + 2*h
+        A[N][N+1] = -1.5*h
 
         solver = LU_SOLVER()
         
@@ -151,4 +161,4 @@ class NUMERIC_KOSHI_23:
 if __name__ == "__main__":
     solver = NUMERIC_KOSHI_23()
 
-    solver.wrapper_wrapper(0.01)
+    solver.wrapper_wrapper(0.1)
